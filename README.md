@@ -55,19 +55,100 @@ MiniDB/
 └── README.md
 ```
 
-## Сборка (Linux/macOS)
+## Установка и сборка
+
+### Требования
+
+- Компилятор с поддержкой C++17: GCC ≥ 9, Clang ≥ 10 или MSVC ≥ 2019.
+- CMake ≥ 3.15.
+- Потоки POSIX (pthreads) — на Linux/macOS обычно уже есть в системе.
+- Git (для клонирования репозитория).
+
+### 1. Получение исходного кода
+
+```bash
+git clone <URL_РЕПОЗИТОРИЯ>
+cd MiniDB
+```
+
+### 2. Установка зависимостей
+
+**Ubuntu / Debian:**
+
+```bash
+sudo apt update
+sudo apt install -y build-essential cmake git
+```
+
+**Fedora / RHEL:**
+
+```bash
+sudo dnf install -y gcc-c++ cmake git
+```
+
+**macOS** (через Homebrew; предварительно установите Xcode Command Line Tools командой `xcode-select --install`):
+
+```bash
+brew install cmake
+```
+
+**Windows:**
+
+Установите один из вариантов:
+
+- [Visual Studio 2019/2022](https://visualstudio.microsoft.com/) с компонентом "Desktop development with C++";
+- либо [MinGW-w64](https://www.mingw-w64.org/) через [MSYS2](https://www.msys2.org/).
+
+А также [CMake для Windows](https://cmake.org/download/) (при установке отметьте опцию "Add CMake to system PATH").
+
+### 3. Сборка на Linux / macOS
 
 ```bash
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build .
-ctest
+cmake --build . -j$(nproc)
 ```
 
-## Сборка (Windows)
+После сборки исполняемые файлы (`minidb`, `test_bplus_tree`, `test_sql_parser`, `test_transactions`)
+появятся в каталоге `build/`.
+
+### 4. Сборка на Windows
+
+Откройте "Developer Command Prompt for VS" (или обычную командную строку, если CMake и компилятор
+уже в `PATH`) в корневой папке проекта и выполните:
 
 ```bat
 build.bat
+```
+
+Скрипт сам создаст каталог `build`, сконфигурирует проект через CMake и соберёт его в конфигурации
+`Release`. Исполняемый файл `minidb.exe` окажется в `build\Release\` (для MSVC) или в `build\` (для MinGW).
+
+### 5. Запуск
+
+```bash
+# Linux/macOS
+./build/minidb
+
+# Windows
+build\Release\minidb.exe
+```
+
+Откроется интерактивная консоль (REPL), принимающая SQL-команды построчно — см. пример ниже.
+
+### 6. Запуск тестов
+
+```bash
+cd build
+ctest --output-on-failure
+```
+
+Либо запустить каждый тестовый набор отдельно:
+
+```bash
+./test_bplus_tree
+./test_sql_parser
+./test_transactions
 ```
 
 ## Пример использования
