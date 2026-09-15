@@ -23,6 +23,20 @@ if errorlevel 1 (
 )
 
 echo.
-echo Сборка завершена успешно. Исполняемый файл minidb находится в %BUILD_DIR%\Release (или %BUILD_DIR%).
+echo Сборка завершена успешно.
+
+REM Ищем собранный minidb.exe (MSVC кладёт его в Release\, MinGW — прямо в build\)
+set EXE_PATH=
+if exist "Release\minidb.exe" set EXE_PATH=%CD%\Release\minidb.exe
+if exist "minidb.exe" set EXE_PATH=%CD%\minidb.exe
+
 cd ..
+
+if defined EXE_PATH (
+    echo Запуск MiniDB в новом окне командной строки...
+    start "MiniDB" cmd /k "%EXE_PATH%"
+) else (
+    echo Не удалось найти minidb.exe после сборки.
+)
+
 endlocal
