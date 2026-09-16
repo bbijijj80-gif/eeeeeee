@@ -15,10 +15,10 @@ Logger& Logger::Instance() {
 namespace {
 const char* LevelToStr(LogLevel level) {
     switch (level) {
-        case LogLevel::DEBUG: return "DEBUG";
-        case LogLevel::INFO: return "INFO";
-        case LogLevel::WARN: return "WARN";
-        case LogLevel::ERROR: return "ERROR";
+        case LogLevel::DEBUG_LEVEL: return "DEBUG";
+        case LogLevel::INFO_LEVEL: return "INFO";
+        case LogLevel::WARN_LEVEL: return "WARN";
+        case LogLevel::ERROR_LEVEL: return "ERROR";
     }
     return "?";
 }
@@ -37,7 +37,7 @@ void Logger::Log(LogLevel level, const std::string& message) {
     localtime_r(&now_c, &tm_buf);
 #endif
 
-    std::ostream& out = (level == LogLevel::ERROR) ? std::cerr : std::cout;
+    std::ostream& out = (level == LogLevel::ERROR_LEVEL) ? std::cerr : std::cout;
     out << "[" << std::put_time(&tm_buf, "%H:%M:%S") << "][" << LevelToStr(level) << "] "
         << message << std::endl;
 }

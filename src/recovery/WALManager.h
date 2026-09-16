@@ -12,7 +12,10 @@
 
 namespace minidb {
 
-enum class WALRecordType { BEGIN, COMMIT, ABORT, INSERT, DELETE, UPDATE };
+// Значения INSERT_RECORD/DELETE_RECORD/UPDATE_RECORD названы не просто INSERT/DELETE/UPDATE,
+// потому что на Windows <windows.h> определяет одноимённые макросы (INSERT, DELETE),
+// которые текстово подменяют такие идентификаторы препроцессором и ломают компиляцию.
+enum class WALRecordType { BEGIN, COMMIT, ABORT, INSERT_RECORD, DELETE_RECORD, UPDATE_RECORD };
 
 struct WALRecord {
     lsn_t lsn;

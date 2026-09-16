@@ -3,6 +3,10 @@
 #include <string>
 
 #ifdef _WIN32
+// Отключаем избыточную часть Win32 API и макросы min/max, которые иначе
+// конфликтуют с std::min/std::max и другими идентификаторами проекта.
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <windows.h>
 #endif
 

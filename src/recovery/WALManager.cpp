@@ -10,9 +10,9 @@ const char* TypeToStr(WALRecordType type) {
         case WALRecordType::BEGIN: return "BEGIN";
         case WALRecordType::COMMIT: return "COMMIT";
         case WALRecordType::ABORT: return "ABORT";
-        case WALRecordType::INSERT: return "INSERT";
-        case WALRecordType::DELETE: return "DELETE";
-        case WALRecordType::UPDATE: return "UPDATE";
+        case WALRecordType::INSERT_RECORD: return "INSERT";
+        case WALRecordType::DELETE_RECORD: return "DELETE";
+        case WALRecordType::UPDATE_RECORD: return "UPDATE";
     }
     return "UNKNOWN";
 }
