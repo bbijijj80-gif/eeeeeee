@@ -12,6 +12,7 @@
 
 #include "../include/macros.h"
 #include "core/DatabaseEngine.h"
+#include "utils/ConsoleUI.h"
 #include "utils/Logger.h"
 
 namespace {
@@ -26,47 +27,33 @@ void SetupConsoleEncoding() {
 #endif
 }
 
-void PrintResult(const minidb::QueryResult& result) {
-    if (!result.column_names.empty()) {
-        for (const auto& name : result.column_names) std::cout << name << "\t";
-        std::cout << "\n";
-        for (const auto& row : result.rows) {
-            for (const auto& value : row) std::cout << value.ToString() << "\t";
-            std::cout << "\n";
-        }
-    }
-    if (!result.message.empty()) {
-        std::cout << result.message << std::endl;
-    }
-}
-
 }  // namespace
 
 int main() {
     SetupConsoleEncoding();
-
-    std::cout << "=== MiniDB — учебное ядро реляционной СУБД ===" << std::endl;
-    std::cout << "Поддерживаемые команды: CREATE TABLE, INSERT INTO, SELECT ... [WHERE], exit" << std::endl;
+    minidb::ui::EnableAnsiSupport();
+    minidb::ui::PrintBanner();
 
     minidb::DatabaseEngine engine;
 
     std::string line;
     while (true) {
-        std::cout << "minidb> ";
+        minidb::ui::PrintPrompt();
         if (!std::getline(std::cin, line)) break;
         if (line == "exit" || line == "quit") break;
         if (line.empty()) continue;
 
         try {
             auto result = engine.ExecuteSQL(line);
-            PrintResult(result);
+            minidb::ui::PrintTable(result);
+            if (!result.message.empty()) minidb::ui::PrintSuccess(result.message);
         } catch (const minidb::MiniDBException& ex) {
-            std::cerr << "Ошибка: " << ex.what() << std::endl;
+            minidb::ui::PrintError(ex.what());
         } catch (const std::exception& ex) {
-            std::cerr << "Непредвиденная ошибка: " << ex.what() << std::endl;
+            minidb::ui::PrintError(std::string("непредвиденная ошибка: ") + ex.what());
         }
     }
 
-    std::cout << "Завершение работы MiniDB." << std::endl;
+    minidb::ui::PrintGoodbye();
     return 0;
 }

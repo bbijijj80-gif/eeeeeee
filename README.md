@@ -1,8 +1,13 @@
 # MiniDB
 
+<p align="center"><img src="assets/minidb_icon_preview.png" width="128" height="128" alt="MiniDB"></p>
+
 MiniDB — учебное ядро реляционной СУБД на C++17 с настоящим постраничным движком хранения,
 буферным пулом с LRU-вытеснением, B+ деревом, простым SQL-парсером, планировщиком/исполнителем
 запросов, менеджером транзакций с блокировками и Undo-журналом, а также Write-Ahead логированием.
+
+Консольный интерфейс (REPL) оформлен цветами ANSI и таблицами из псевдографики; на Windows
+`minidb.exe` собирается со своей иконкой (`assets/minidb.ico` — стилизованный сервер с базой данных).
 
 ## Архитектура
 
@@ -35,6 +40,8 @@ SQLLexer → SQLParser → AST → QueryPlanner → QueryExecutor
   таблицы (Shared/Exclusive) и откат через журнал компенсирующих действий.
 * **WALManager / Checkpoint** — журналирование "вперёд записи" (Write-Ahead Logging) для
   восстановления после сбоев.
+* **ConsoleUI** — оформление REPL: цветной баннер, подсветка вывода и таблицы для результатов
+  `SELECT`, отрисованные символами псевдографики (┌─┬─┐).
 
 ## Структура проекта
 
@@ -47,7 +54,10 @@ MiniDB/
 │   ├── query/                # SQLLexer, SQLParser, ASTNodes, QueryPlanner, QueryExecutor
 │   ├── transaction/          # TransactionManager, LockManager, UndoLog
 │   ├── recovery/             # WALManager, Checkpoint
-│   └── utils/                 # Logger, ErrorCodes, MemoryPool
+│   ├── utils/                 # Logger, ErrorCodes, MemoryPool, ConsoleUI
+│   ├── resources.rc           # Иконка и версия minidb.exe (только Windows)
+│   └── resource.h
+├── assets/                     # minidb.ico, превью иконки
 ├── include/                   # types.h, config.h, macros.h
 ├── tests/                      # test_bplus_tree, test_sql_parser, test_transactions
 ├── CMakeLists.txt

@@ -38,13 +38,19 @@ set(MINIDB_CORE_SOURCES
     src/utils/Logger.cpp
     src/utils/ErrorCodes.cpp
     src/utils/MemoryPool.cpp
+    src/utils/ConsoleUI.cpp
 )
 
 add_library(minidb_core STATIC ${MINIDB_CORE_SOURCES})
 target_include_directories(minidb_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(minidb_core PUBLIC Threads::Threads)
 
-add_executable(minidb src/main.cpp)
+if(WIN32)
+    enable_language(RC)
+    set(MINIDB_WIN32_RESOURCES src/resources.rc)
+endif()
+
+add_executable(minidb src/main.cpp ${MINIDB_WIN32_RESOURCES})
 target_link_libraries(minidb PRIVATE minidb_core)
 
 enable_testing()
