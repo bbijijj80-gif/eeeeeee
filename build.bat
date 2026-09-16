@@ -4,14 +4,25 @@ setlocal
 
 set BUILD_DIR=build
 
+REM --- Find cmake.exe: PATH first, then common install locations. ---
+REM Some installers do not add CMake to PATH by default (the Start Menu
+REM folder is just shortcuts, not the actual install directory).
+set CMAKE_EXE=
+
 where cmake >nul 2>nul
-if errorlevel 1 goto no_cmake
+if not errorlevel 1 set CMAKE_EXE=cmake
+
+if not defined CMAKE_EXE if exist "%ProgramFiles%\CMake\bin\cmake.exe" set CMAKE_EXE=%ProgramFiles%\CMake\bin\cmake.exe
+if not defined CMAKE_EXE if exist "%ProgramFiles(x86)%\CMake\bin\cmake.exe" set CMAKE_EXE=%ProgramFiles(x86)%\CMake\bin\cmake.exe
+if not defined CMAKE_EXE if exist "%LocalAppData%\Programs\CMake\bin\cmake.exe" set CMAKE_EXE=%LocalAppData%\Programs\CMake\bin\cmake.exe
+
+if not defined CMAKE_EXE goto no_cmake
 
 if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
 
 cd "%BUILD_DIR%"
 
-REM Pick a generator that matches what is actually installed.
+REM --- Pick a generator that matches what is actually installed. ---
 REM Without this, CMake can default to "NMake Makefiles" (Visual Studio
 REM toolchain) even when only MinGW is present, which fails immediately.
 set GENERATOR=
@@ -19,10 +30,8 @@ set GENERATOR=
 where g++ >nul 2>nul
 if not errorlevel 1 set GENERATOR=MinGW Makefiles
 
-if not defined GENERATOR (
-    where cl >nul 2>nul
-    if not errorlevel 1 set GENERATOR=NMake Makefiles
-)
+if not defined GENERATOR where cl >nul 2>nul
+if not defined GENERATOR if not errorlevel 1 set GENERATOR=NMake Makefiles
 
 if not defined GENERATOR goto no_compiler
 
@@ -30,13 +39,14 @@ REM Wipe any cache left by a previous run with a different/failed generator
 if exist CMakeCache.txt del /q CMakeCache.txt
 if exist CMakeFiles rd /s /q CMakeFiles
 
+echo Using cmake: "%CMAKE_EXE%"
 echo Configuring project with CMake (generator: %GENERATOR%)...
-cmake .. -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+"%CMAKE_EXE%" .. -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=Release
 if errorlevel 1 goto cmake_failed
 
 echo.
 echo Building project...
-cmake --build . --config Release
+"%CMAKE_EXE%" --build . --config Release
 if errorlevel 1 goto build_failed
 
 echo.
@@ -55,8 +65,10 @@ start "MiniDB" "%EXE_PATH%"
 goto end
 
 :no_cmake
-echo [ERROR] cmake was not found in PATH.
-echo Install CMake from https://cmake.org/download/ and make sure it is added to PATH.
+echo [ERROR] cmake.exe was not found in PATH or in common install locations.
+echo Install CMake from https://cmake.org/download/ and either add it to
+echo PATH during installation, or make sure it is under
+echo "%%ProgramFiles%%\CMake\bin\cmake.exe".
 goto end
 
 :no_compiler
