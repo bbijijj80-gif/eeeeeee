@@ -2,11 +2,25 @@
 #include <iostream>
 #include <string>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "../include/macros.h"
 #include "core/DatabaseEngine.h"
 #include "utils/Logger.h"
 
 namespace {
+
+// Исходники в UTF-8, но консоль Windows по умолчанию использует кодовую
+// страницу OEM (866 для русской локали), из-за чего кириллица превращается
+// в нечитаемые символы. Переключаем консоль на UTF-8 при старте программы.
+void SetupConsoleEncoding() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+}
 
 void PrintResult(const minidb::QueryResult& result) {
     if (!result.column_names.empty()) {
@@ -25,6 +39,8 @@ void PrintResult(const minidb::QueryResult& result) {
 }  // namespace
 
 int main() {
+    SetupConsoleEncoding();
+
     std::cout << "=== MiniDB — учебное ядро реляционной СУБД ===" << std::endl;
     std::cout << "Поддерживаемые команды: CREATE TABLE, INSERT INTO, SELECT ... [WHERE], exit" << std::endl;
 
